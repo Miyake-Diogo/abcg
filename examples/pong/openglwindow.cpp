@@ -40,7 +40,7 @@ void OpenGLWindow::initializeGL() {
   // Load a new font
   ImGuiIO &io{ImGui::GetIO()};
   const auto filename{getAssetsPath() + "Inconsolata-Medium.ttf"};
-  m_font = io.Fonts->AddFontFromFileTTF(filename.c_str(), 60.0f);
+  m_font = io.Fonts->AddFontFromFileTTF(filename.c_str(), 30.0f);
   if (m_font == nullptr) {
     throw abcg::Exception{abcg::Exception::Runtime("Cannot load font file")};
   }
@@ -93,7 +93,7 @@ void OpenGLWindow::update() {
   m_barRight.update(m_gameData, deltaTime);
   m_barLeft.update(m_gameData, deltaTime);
   m_ball.update(m_barLeft, m_barRight, m_gameData, deltaTime);
-  m_scenary.update(m_gameData, deltaTime);
+  m_scenary.update(m_gameData);
   // m_ship.update(m_gameData, deltaTime);
   // m_starLayers.update(m_ship, deltaTime);
   // m_asteroids.update(m_ship, deltaTime);
@@ -199,11 +199,16 @@ void OpenGLWindow::checkCollisions() {
     m_ball.m_velocity = glm::vec2{1.0f, (m_barRight.m_translation.y - (ballTranslation.y / 15.5f))} * m_ball.m_ballSpeed;
   }
 
-  /*
-  if(ballTranslation.x <= -14.5f && (ballTranslation.y >= ((m_scenary.m_translation.y * 15.5f) - 3.5f) && ballTranslation.y <= ((m_scenary.m_translation.y * 15.5f) + 3.5f))){
+  // Check collision between ball and scenary
+  if(ballTranslation.y <= -14.5f && (ballTranslation.x >= ((m_scenary.m_translation.x * 15.5f) - 3.5f) && ballTranslation.x <= ((m_scenary.m_translation.x * 15.5f) + 3.5f))){
     m_ball.direction = !m_ball.direction;
-  }*/
+    m_ball.m_velocity = glm::vec2{1.0f, ((ballTranslation.x / 15.5f) - m_scenary.m_translation.x)} * m_ball.m_ballSpeed;
+  }
 
+  if(ballTranslation.y >= +14.5f && (ballTranslation.x >= ((m_scenary.m_translation.y * 15.5f) - 3.5f) && ballTranslation.x <= ((m_scenary.m_translation.x * 15.5f) + 3.5f))){
+    m_ball.direction = !m_ball.direction;
+    m_ball.m_velocity = glm::vec2{1.0f, (m_scenary.m_translation.x - (ballTranslation.x / 15.5f))} * m_ball.m_ballSpeed;
+  }
   /*
   // Check collision between ship and asteroids
   for (const auto &asteroid : m_asteroids.m_asteroids) {
@@ -261,14 +266,14 @@ void OpenGLWindow::checkCollisions() {
 void OpenGLWindow::checkWinCondition() {
   const auto ballTranslation{m_ball.m_translation * glm::vec2{15.5f, 15.5f}};
   
-  if (ballTranslation.x > +15.5f) {
-    m_gameData.m_state = State::WinPlayer1;
-    m_restartWaitTimer.restart();
-  }
-  if (ballTranslation.x < -15.5f) {
-    m_gameData.m_state = State::WinPlayer2;
-    m_restartWaitTimer.restart();
-  }
+    if (ballTranslation.x > +16.5f) {
+      m_gameData.m_state = State::WinPlayer1;
+      m_restartWaitTimer.restart();
+    }
+    if (ballTranslation.x < -16.5f) {
+      m_gameData.m_state = State::WinPlayer2;
+      m_restartWaitTimer.restart();
+    }
 
 }
 
