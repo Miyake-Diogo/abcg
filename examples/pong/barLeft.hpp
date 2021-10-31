@@ -4,11 +4,6 @@
 #include "abcg.hpp"
 #include "gamedata.hpp"
 
-/*
-class Asteroids;
-class Bullets;
-class StarLayers;
-*/
 class OpenGLWindow;
 class Ball;
 
@@ -26,10 +21,6 @@ class BarLeft {
   friend OpenGLWindow;  
   friend Ball;
 
-/*  friend Asteroids;
-  friend Bullets;
-  friend StarLayers;
-*/
   GLuint m_program{};
   GLint m_translationLoc{};
   GLint m_colorLoc{};

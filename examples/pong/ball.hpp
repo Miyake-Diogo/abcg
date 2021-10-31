@@ -38,8 +38,6 @@ class Ball {
 
   float m_scale{0.050f};
   float m_ballSpeed{1.5f};
-
-  // std::list<Ball> m_balls;
 };
 
 #endif
