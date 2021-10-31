@@ -16,7 +16,7 @@ class Ball {
   void paintGL();
   void terminateGL();
 
-  void update(BarLeft &barLeft, BarRight &barRight, const GameData &gameData, float deltaTime);
+  void update(float deltaTime);
 
  private:
   friend OpenGLWindow;

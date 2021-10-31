@@ -77,7 +77,7 @@ void Ball::terminateGL() {
   abcg::glDeleteVertexArrays(1, &m_vao);
 }
 
-void Ball::update(BarLeft &barLeft, BarRight &barRight,const GameData &gameData, float deltaTime) {
+void Ball::update(float deltaTime) {
   // Create Ball
   if (!direction) {
     m_translation -= m_velocity * deltaTime;

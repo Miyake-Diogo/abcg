@@ -82,7 +82,7 @@ void OpenGLWindow::update() {
   }
   m_barRight.update(m_gameData, deltaTime);
   m_barLeft.update(m_gameData, deltaTime);
-  m_ball.update(m_barLeft, m_barRight, m_gameData, deltaTime);
+  m_ball.update(deltaTime);
   m_scenary.update(m_gameData);
 
   if (m_gameData.m_state == State::Playing) {
