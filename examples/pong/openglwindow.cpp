@@ -45,12 +45,6 @@ void OpenGLWindow::initializeGL() {
     throw abcg::Exception{abcg::Exception::Runtime("Cannot load font file")};
   }
 
-  
-  // Create program to render the stars
-  /*
-  m_starsProgram = createProgramFromFile(getAssetsPath() + "stars.vert",
-                                         getAssetsPath() + "stars.frag"); */
-
   // Create program to render the other objects
   m_objectsProgram = createProgramFromFile(getAssetsPath() + "objects.vert",
                                            getAssetsPath() + "objects.frag");
@@ -75,10 +69,6 @@ void OpenGLWindow::restart() {
   m_barRight.initializeGL(m_objectsProgram);
   m_ball.initializeGL(m_objectsProgram);
   m_scenary.initializeGL(m_objectsProgram);
-  // m_starLayers.initializeGL(m_starsProgram, 25);
-  // m_ship.initializeGL(m_objectsProgram);
-  // m_asteroids.initializeGL(m_objectsProgram, 3);
-  // m_bullets.initializeGL(m_objectsProgram);
 }
 
 void OpenGLWindow::update() {
@@ -94,11 +84,6 @@ void OpenGLWindow::update() {
   m_barLeft.update(m_gameData, deltaTime);
   m_ball.update(m_barLeft, m_barRight, m_gameData, deltaTime);
   m_scenary.update(m_gameData);
-  // m_ship.update(m_gameData, deltaTime);
-  // m_starLayers.update(m_ship, deltaTime);
-  // m_asteroids.update(m_ship, deltaTime);
-  // m_bullets.update(m_ship, m_gameData, deltaTime);
-
 
   if (m_gameData.m_state == State::Playing) {
     checkCollisions();
@@ -159,15 +144,8 @@ void OpenGLWindow::resizeGL(int width, int height) {
 }
 
 void OpenGLWindow::terminateGL() {
-  // abcg::glDeleteProgram(m_starsProgram);
   abcg::glDeleteProgram(m_objectsProgram);
 
-  /*
-  m_asteroids.terminateGL();
-  m_bullets.terminateGL();
-  m_ship.terminateGL();
-  m_starLayers.terminateGL();
-  */
   m_barRight.terminateGL();
   m_barLeft.terminateGL();
   m_ball.terminateGL();
@@ -176,32 +154,29 @@ void OpenGLWindow::terminateGL() {
 
 
 void OpenGLWindow::checkCollisions() {
-  // Check collision between bar and ball
   const auto ballTranslation{m_ball.m_translation * glm::vec2{15.5f, 15.5f}};
-  
-  /*
-  const auto distance{glm::distance(glm::vec2{-1, m_barLeft.m_translation.y}, ballTranslation)};
 
-  if (distance < m_barLeft.m_scale * 0.07f + m_ball.m_scale) {
-    m_ball.direction = !m_ball.direction;
-    // m_gameData.m_state = State::GameOver;
-    // m_restartWaitTimer.restart();
-  }
-  */
-
+  // Check collision with left bar
   if(ballTranslation.x <= -14.5f && (ballTranslation.y >= ((m_barLeft.m_translation.y * 15.5f) - 3.5f) && ballTranslation.y <= ((m_barLeft.m_translation.y * 15.5f) + 3.5f))){
-    m_ball.direction = !m_ball.direction;
-    m_ball.m_velocity = glm::vec2{1.0f, ((ballTranslation.y / 15.5f) - m_barLeft.m_translation.y)} * m_ball.m_ballSpeed;
+    if (m_colisionTimer.elapsed() > 100.0 / 1000.0) {
+      m_colisionTimer.restart();
+      m_ball.direction = !m_ball.direction;
+      m_ball.m_velocity = glm::vec2{1.0f, ((ballTranslation.y / 15.5f) - m_barLeft.m_translation.y)} * m_ball.m_ballSpeed;
+    }
   }
-
-  if(ballTranslation.x >= +14.5f && (ballTranslation.y >= ((m_barRight.m_translation.y * 15.5f) - 3.5f) && ballTranslation.y <= ((m_barRight.m_translation.y * 15.5f) + 3.5f))){
-    m_ball.direction = !m_ball.direction;
-    m_ball.m_velocity = glm::vec2{1.0f, (m_barRight.m_translation.y - (ballTranslation.y / 15.5f))} * m_ball.m_ballSpeed;
+  // Check collision with right bar
+  else if(ballTranslation.x >= +14.5f && (ballTranslation.y >= ((m_barRight.m_translation.y * 15.5f) - 3.5f) && ballTranslation.y <= ((m_barRight.m_translation.y * 15.5f) + 3.5f))){
+    if (m_colisionTimer.elapsed() > 100.0 / 1000.0) {
+      m_colisionTimer.restart();
+      m_ball.direction = !m_ball.direction;
+      m_ball.m_velocity = glm::vec2{1.0f, (m_barRight.m_translation.y - (ballTranslation.y / 15.5f))} * m_ball.m_ballSpeed;
+    }
   }
 
   // Check collision between ball and scenary
   if(ballTranslation.y <= -14.5f && (ballTranslation.x >= ((m_scenary.m_translation.x * 15.5f) - 3.5f) && ballTranslation.x <= ((m_scenary.m_translation.x * 15.5f) + 3.5f))){
     m_ball.direction = !m_ball.direction;
+
     m_ball.m_velocity = glm::vec2{1.0f, ((ballTranslation.x / 15.5f) - m_scenary.m_translation.x)} * m_ball.m_ballSpeed;
   }
 
@@ -260,22 +235,25 @@ void OpenGLWindow::checkCollisions() {
         [](const Asteroids::Asteroid &a) { return a.m_hit; });
   }
   */
+
 }
 
 
 void OpenGLWindow::checkWinCondition() {
   const auto ballTranslation{m_ball.m_translation * glm::vec2{15.5f, 15.5f}};
   
-    if (ballTranslation.x > +16.5f) {
+  if(m_gameData.m_state == State::Playing){
+    if (ballTranslation.x > +15.5f ) {
       m_gameData.m_state = State::WinPlayer1;
       m_restartWaitTimer.restart();
     }
-    if (ballTranslation.x < -16.5f) {
+    else if (ballTranslation.x < -15.5f) {
       m_gameData.m_state = State::WinPlayer2;
       m_restartWaitTimer.restart();
     }
-
+  }
 }
+
 
 /*
 void OpenGLWindow::transformPosition(auto position) {
