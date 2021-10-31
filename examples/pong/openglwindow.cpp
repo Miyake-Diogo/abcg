@@ -83,7 +83,7 @@ void OpenGLWindow::update() {
   m_barRight.update(m_gameData, deltaTime);
   m_barLeft.update(m_gameData, deltaTime);
   m_ball.update(m_barLeft, m_barRight, m_gameData, deltaTime);
-  m_scenary.update(m_gameData, deltaTime);
+  m_scenary.update(m_gameData);
 
   if (m_gameData.m_state == State::Playing) {
     checkCollisions();
@@ -173,10 +173,69 @@ void OpenGLWindow::checkCollisions() {
     }
   }
 
-  /*
-  if(ballTranslation.x <= -14.5f && (ballTranslation.y >= ((m_scenary.m_translation.y * 15.5f) - 3.5f) && ballTranslation.y <= ((m_scenary.m_translation.y * 15.5f) + 3.5f))){
+  // Check collision between ball and scenary
+  if(ballTranslation.y <= -14.5f && (ballTranslation.x >= ((m_scenary.m_translation.x * 15.5f) - 3.5f) && ballTranslation.x <= ((m_scenary.m_translation.x * 15.5f) + 3.5f))){
     m_ball.direction = !m_ball.direction;
-  }*/
+
+    m_ball.m_velocity = glm::vec2{1.0f, ((ballTranslation.x / 15.5f) - m_scenary.m_translation.x)} * m_ball.m_ballSpeed;
+  }
+
+  if(ballTranslation.y >= +14.5f && (ballTranslation.x >= ((m_scenary.m_translation.y * 15.5f) - 3.5f) && ballTranslation.x <= ((m_scenary.m_translation.x * 15.5f) + 3.5f))){
+    m_ball.direction = !m_ball.direction;
+    m_ball.m_velocity = glm::vec2{1.0f, (m_scenary.m_translation.x - (ballTranslation.x / 15.5f))} * m_ball.m_ballSpeed;
+  }
+  /*
+  // Check collision between ship and asteroids
+  for (const auto &asteroid : m_asteroids.m_asteroids) {
+    const auto asteroidTranslation{asteroid.m_translation};
+    const auto distance{
+        glm::distance(m_ship.m_translation, asteroidTranslation)};
+
+    if (distance < m_ship.m_scale * 0.9f + asteroid.m_scale * 0.85f) {
+      m_gameData.m_state = State::GameOver;
+      m_restartWaitTimer.restart();
+    }
+  }
+
+  // Check collision between bullets and asteroids
+  for (auto &bullet : m_bullets.m_bullets) {
+    if (bullet.m_dead) continue;
+
+    for (auto &asteroid : m_asteroids.m_asteroids) {
+      for (const auto i : {-2, 0, 2}) {
+        for (const auto j : {-2, 0, 2}) {
+          const auto asteroidTranslation{asteroid.m_translation +
+                                         glm::vec2(i, j)};
+          const auto distance{
+              glm::distance(bullet.m_translation, asteroidTranslation)};
+
+          if (distance < m_bullets.m_scale + asteroid.m_scale * 0.85f) {
+            asteroid.m_hit = true;
+            bullet.m_dead = true;
+          }
+        }
+      }
+    }
+
+    // Break asteroids marked as hit
+    for (const auto &asteroid : m_asteroids.m_asteroids) {
+      if (asteroid.m_hit && asteroid.m_scale > 0.10f) {
+        std::uniform_real_distribution<float> m_randomDist{-1.0f, 1.0f};
+        std::generate_n(std::back_inserter(m_asteroids.m_asteroids), 3, [&]() {
+          const glm::vec2 offset{m_randomDist(m_randomEngine),
+                                 m_randomDist(m_randomEngine)};
+          return m_asteroids.createAsteroid(
+              asteroid.m_translation + offset * asteroid.m_scale * 0.5f,
+              asteroid.m_scale * 0.5f);
+        });
+      }
+    }
+
+    m_asteroids.m_asteroids.remove_if(
+        [](const Asteroids::Asteroid &a) { return a.m_hit; });
+  }
+  */
+
 }
 
 
@@ -194,3 +253,12 @@ void OpenGLWindow::checkWinCondition() {
     }
   }
 }
+
+
+/*
+void OpenGLWindow::transformPosition(auto position) {
+
+  position /= 15.5f;
+
+  return position;
+}*/

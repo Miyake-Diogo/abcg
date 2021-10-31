@@ -20,7 +20,7 @@ class Scenary {
   void terminateGL();
 
   
-  void update(const GameData &gameData, float deltaTime);
+  void update(const GameData &gameData);
   
 
  private:

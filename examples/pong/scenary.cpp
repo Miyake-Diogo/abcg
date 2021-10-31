@@ -176,7 +176,7 @@ void Scenary::terminateGL() {
 }
 
 
-void Scenary::update(const GameData &gameData, float deltaTime) {
+void Scenary::update(const GameData &gameData) {
   // gambiarra para build
   if (gameData.m_state == State::Playing){
   m_velocity += 0; // glm::vec2{0.0f, 300.0f} * deltaTime;
